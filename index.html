@@ -1,11 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="GeoNarrative Template" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>GeoNarrative Template</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://unpkg.com/scrollama"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
 </head>
+
 <body>
-    <h1>Hello, GitHub!</h1>
+    <section id="cover">
+        <video class="fullscreen canvas-center" playsinline="" autoplay="" muted="" loop="">
+            <source src="assets/urban_green_spaces.mp4" type="video/mp4">
+        </video>
+        <div id="intro">
+            <h1>Urban Green Spaces in Major Cities</h1>
+            <h5>Joey Yeo</h5>
+            <p>
+                Urban green spaces are vital to the health and well-being of city residents, providing essential ecosystem services, recreational areas, and a refuge from the urban environment. These areas range from small pocket parks to extensive public gardens and play a critical role in urban planning, environmental sustainability, and social cohesion. Through this Geo-narrative, we will explore the distribution and characteristics of urban green spaces across major cities, highlighting their importance in promoting a healthy urban lifestyle and environmental resilience.
+            </p>
+
+            <div class="footnote">
+                <span> For more insights on Urban Green Spaces, click on the logo</span>
+                <a target="_blank" href="https://www.nature.org/en-us/get-involved/how-to-help/places-we-protect/urban-conservation/"> <img src="img/green_space_logo.png" width="50px"></a>
+            </div>
+        </div>
+    </section>
+
+    <section id="geonarrative">
+        <div id="storyboard">
+            <div id="map"></div>
+        </div>
+
+        <article class="scene" data-scene="0">
+            <h2>Introduction to Urban Green Spaces</h2>
+                <p>This section provides an overview of what constitutes urban green spaces, their types, and the myriad benefits they offer to urban environments and their inhabitants.</p>
+        </article>
+
+        <article class="scene" data-scene="1">
+            <h2>The Role of Green Spaces in Urban Ecosystems</h2>
+                <p>Urban green spaces are not just areas of leisure; they are critical components of the urban ecosystem, offering benefits such as biodiversity, stormwater management, and carbon sequestration.</p>
+        </article>
+
+        <article class="scene" data-scene="2">
+            <h2>Case Study: The High Line, New York City</h2>
+                <p>A look at how the High Line transformed a derelict piece of urban infrastructure into one of New York City's most beloved public spaces, serving as a model for cities worldwide.</p>
+        </article>
+
+        <article class="scene" data-scene="3">
+            <h2>Challenges Facing Urban Green Spaces</h2>
+                <p>Despite their value, urban green spaces face challenges such as development pressure, climate change, and maintenance funding. This section explores these issues in detail.</p>
+        </article>
+
+        <article class="scene" data-scene="4">
+            <h2>Global Initiatives and Future Prospects</h2>
+                <p>Highlighting global initiatives aimed at preserving and expanding urban green spaces, this section looks at the future of green spaces in urban planning and sustainability efforts.</p>
+        </article>
+
+        <article class="scene" data-scene="5">
+            <h2>Urban Green Spaces Gallery</h2>
+                <img src="img/urban_green_gallery.jpg">
+        </article>
+
+        <article class="scene fullscreen" data-scene="6">
+        </article>
+    </section>
+
+    <section id="footer">
+        <h2>Explore, Connect, Thrive</h2>
+    </section>
+
+    <script>
+        let map, scriptPanel = scrollama(), greenSpacesLayer, urbanAreasLayer;
+        history.scrollRestoration = "manual";
+        window.scrollTo(0, 0);
+        adjustStoryboardlSize();
+        window.addEventListener("resize", adjustStoryboardlSize);
+
+        function adjustStoryboardlSize() {
+            const scenes = document.getElementsByClassName("scene");
+            const storyboard = document.getElementById("storyboard");
+            let sceneH = Math.floor(window.innerHeight * 0.75);
+            for (const scene of scenes) {
+                scene.style.height = sceneH + "px";
+            }
+
+            let storyboardHeight = window.innerHeight;
+            let storyboardMarginTop = (window.innerHeight - storyboardHeight) / 2;
+            storyboard.style.height = storyboardHeight + "px";
+            storyboard.style.top = storyboardMarginTop + "px";
+            scriptPanel.resize();
+        }
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY3RoMjMiLCJhIjoiY2xzNnRqamx3MHU2YjJqbzc5dnJwZDBwciJ9.TNE4ZpGv__f5i3hTfNPlkQ';
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            zoom: 3,
+            minZoom: 2,
+            maxZoom: 11,
+            center: [-98.5795, 39.8283],
+            scrollZoom: false,
+            boxZoom: false,
+            doubleClickZoom: false
+        });
+
+        async function geojsonFetch() {
+            let response, greenSpaces, urbanAreas;
+            response = await fetch("assets/urban_areas.geojson");
+            urbanAreas = await response.json();
+            response = await fetch("assets/green_spaces.geojson");
+            greenSpaces = await response.json();
+
+            map.on('load', () => {
+                map.addSource('urban-areas-src', {
+                    type: 'geojson',
+                    data: urbanAreas
+                });
+
+                map.addSource('green-spaces-src', {
+                    type: 'geojson',
+                    data: greenSpaces
+                });
+
+                urbanAreasLayer = {
+                    'id': 'urban-areas-fill',
+                    'type': 'fill',
+                    'source': 'urban-areas-src',
+                    'minzoom': 1,
+                    'paint': {
+                        'fill-color': '#f08',
+                        'fill-opacity': 0.4
+                    }
+                };
+                
+                greenSpacesLayer = {
+                    'id': 'green-spaces-fill',
+                    'type': 'fill',
+                    'source': 'green-spaces-src',
+                    'minzoom': 1,
+                    'paint': {
+                        'fill-color': '#0f0',
+                        'fill-opacity': 0.8
+                    }
+                };
+
+                scriptPanel
+                    .setup({
+                        step: ".scene",
+                        offset: 0.33,
+                        debug: false
+                    })
+                    .onStepEnter(handleSceneEnter)
+                    .onStepExit(handleSceneExit);
+
+                
+            });
+        }
+        geojsonFetch();
+    </script>
 </body>
+
+
 </html>
