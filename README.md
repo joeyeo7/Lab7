@@ -20,3 +20,5 @@ This GeoNarrative project provides an interactive exploration of urban green spa
 to educate and inspire people about the value of green spaces in urban environments and to support their expansion and maintenance. Through this project, we seek to show how important urban green spaces are for both aesthetically pleasant and sustainable urban living.
 
 The fundamental relevance of green areas to our urban ecosystems, social welfare, and environmental health is brought to light by this research. Our goal is to stimulate action towards the creation of more resilient, healthful, and green urban settings for future generations by investigating the green heart of cities.
+
+http://127.0.0.1:5500/labs/lab07/index.html
